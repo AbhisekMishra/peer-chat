@@ -5,7 +5,8 @@ import io from 'socket.io-client';
 import Peer from 'peerjs';
 
 export default function Room() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params?.id as string;
   const [peers, setPeers] = useState<{ [key: string]: any }>({});
   const [userStream, setUserStream] = useState<MediaStream | null>(null);
   const socketRef = useRef<any>();

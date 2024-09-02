@@ -10,11 +10,20 @@ const options = {
 };
 
 const server = https.createServer(options, app);
-const io = socketIo(server);
+const io = socketIo(server, {
+  pingTimeout: 60000,
+  pingInterval: 25000
+});
 
 const MAX_USERS_PER_ROOM = 10;
 
 io.on('connection', (socket) => {
+  console.log('New connection:', socket.id);
+  
+  socket.on('error', (error) => {
+    console.error('Socket error:', error);
+  });
+
   socket.on('join-room', (roomId) => {
     const room = io.sockets.adapter.rooms.get(roomId);
     if (room && room.size >= MAX_USERS_PER_ROOM) {
@@ -29,6 +38,10 @@ io.on('connection', (socket) => {
       socket.to(roomId).emit('user-disconnected', socket.id);
     });
   });
+});
+
+server.on('error', (error) => {
+  console.error('Server error:', error);
 });
 
 const PORT = process.env.PORT || 3001;

@@ -103,13 +103,12 @@ export default function Room() {
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <h1 className="text-2xl font-bold mb-4">Room: {id}</h1>
       <div className="grid grid-cols-2 gap-4">
-        <video ref={userVideoRef} muted autoPlay playsInline className="w-full h-auto" />
+        <video ref={userVideoRef} autoPlay playsInline className="w-full h-auto" />
         {Object.entries(peers).map(([peerId, stream]) => (
           <video 
             key={peerId} 
             autoPlay 
-            playsInline 
-            muted
+            playsInline
             className="w-full h-auto" 
             ref={el => {
               if (el && stream instanceof MediaStream) {

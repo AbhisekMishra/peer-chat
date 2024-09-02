@@ -1,9 +1,15 @@
 const express = require('express');
-const http = require('http');
+const https = require('https');
 const socketIo = require('socket.io');
 
 const app = express();
-const server = http.createServer(app);
+
+// Read SSL certificate files
+const options = {
+  rejectUnauthorized: false
+};
+
+const server = https.createServer(options, app);
 const io = socketIo(server);
 
 const MAX_USERS_PER_ROOM = 10;
@@ -26,4 +32,4 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server is running on port ${PORT} (HTTPS)`));

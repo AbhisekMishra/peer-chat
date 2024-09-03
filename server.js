@@ -12,7 +12,9 @@ const options = {
 const server = https.createServer(options, app);
 const io = socketIo(server, {
   pingTimeout: 60000,
-  pingInterval: 25000
+  pingInterval: 25000,
+  transports: ['polling'], // Force long-polling
+  allowEIO3: true // Allow Engine.IO 3 client
 });
 
 const MAX_USERS_PER_ROOM = 10;

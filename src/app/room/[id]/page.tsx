@@ -25,42 +25,45 @@ export default function Room() {
       socketRef.current.emit('join-room', id, peerId);
     });
 
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        setUserStream(stream);
-        if (userVideoRef.current) {
-          userVideoRef.current.srcObject = stream;
-        }
+    navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: { echoCancellation: true } // Moved echoCancellation under audio constraints
+    })
+    .then(stream => {
+      setUserStream(stream);
+      if (userVideoRef.current) {
+        userVideoRef.current.srcObject = stream;
+      }
 
-        socketRef.current.on('user-connected', (userId: string) => {
-          console.log('User connected:', userId);
-          connectToNewUser(userId, stream);
-        });
-
-        peerRef.current.on('call', (call: any) => {
-          console.log('Receiving call from:', call.peer);
-          call.answer(stream);
-          call.on('stream', (userVideoStream: MediaStream) => {
-            console.log('Received stream from:', call.peer);
-            addVideoStream(call.peer, userVideoStream);
-          });
-        });
-
-        socketRef.current.on('user-disconnected', (userId: string) => {
-          console.log('User disconnected:', userId);
-          if (peers[userId]) {
-            peers[userId].close();
-            setPeers(prevPeers => {
-              const newPeers = { ...prevPeers };
-              delete newPeers[userId];
-              return newPeers;
-            });
-          }
-        });
-      })
-      .catch(error => {
-        console.error('Error accessing media devices:', error);
+      socketRef.current.on('user-connected', (userId: string) => {
+        console.log('User connected:', userId);
+        connectToNewUser(userId, stream);
       });
+
+      peerRef.current.on('call', (call: any) => {
+        console.log('Receiving call from:', call.peer);
+        call.answer(stream);
+        call.on('stream', (userVideoStream: MediaStream) => {
+          console.log('Received stream from:', call.peer);
+          addVideoStream(call.peer, userVideoStream);
+        });
+      });
+
+      socketRef.current.on('user-disconnected', (userId: string) => {
+        console.log('User disconnected:', userId);
+        if (peers[userId]) {
+          peers[userId].close();
+          setPeers(prevPeers => {
+            const newPeers = { ...prevPeers };
+            delete newPeers[userId];
+            return newPeers;
+          });
+        }
+      });
+    })
+    .catch(error => {
+      console.error('Error accessing media devices:', error);
+    });
 
     return () => {
       socketRef.current.disconnect();

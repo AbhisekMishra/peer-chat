@@ -106,14 +106,27 @@ export default function Room() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <h1 className="text-2xl font-bold mb-4">Room: {id}</h1>
-      <div className="grid gap-4 w-full h-full" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))' }}>
-        <video ref={userVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
+      <div 
+        className="grid gap-4 w-full h-full" 
+        style={{ 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+          gridAutoRows: 'minmax(100px, auto)' // Ensure rows are responsive
+        }}
+      >
+        <video 
+          ref={userVideoRef} 
+          autoPlay 
+          playsInline 
+          className="w-full h-full object-cover" 
+          style={{ maxHeight: '200px' }} // Limit max height for better mobile view
+        />
         {Object.entries(peers).map(([peerId, stream]) => (
           <video 
             key={peerId} 
             autoPlay 
             playsInline
             className="w-full h-full object-cover" 
+            style={{ maxHeight: '200px' }} // Limit max height for better mobile view
             ref={el => {
               if (el && stream instanceof MediaStream) {
                 el.srcObject = stream;
